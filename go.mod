@@ -1,1 +1,1 @@
-module github.com/filipovi/minica
+module github.com/filipovi/simpleca
