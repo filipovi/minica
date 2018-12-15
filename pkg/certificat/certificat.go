@@ -93,23 +93,34 @@ func Create(fn, cn string, pk *rsa.PrivateKey) (*x509.Certificate, error) {
 	return x509.ParseCertificate(der)
 }
 
-// Create a new Signed Certificat file
-func CreateSigned(fn, cn string, pk, capk *rsa.PrivateKey, cac *x509.Certificate, dns, ips []string) (*x509.Certificate, error) {
-	serial, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
-	if err != nil {
-		return nil, err
-	}
+func parseIP(ips []string) ([]net.IP, error) {
 	var parsed []net.IP
 	for _, s := range ips {
 		p := net.ParseIP(s)
 		if p == nil {
-			return nil, fmt.Errorf("invalid IP address %s", s)
+			return nil, fmt.Errorf("invalid IP address: %s", s)
 		}
 		parsed = append(parsed, p)
 	}
+
+	return parsed, nil
+}
+
+// Create a new Signed Certificat file
+func CreateSigned(fn, cn string, pk, capk *rsa.PrivateKey, cac *x509.Certificate, ips, dns []string) (*x509.Certificate, error) {
+	serial, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
+	if err != nil {
+		return nil, err
+	}
+
+	parsedIPs, err := parseIP(ips)
+	if err != nil {
+		return nil, err
+	}
+
 	template := &x509.Certificate{
 		DNSNames:    dns,
-		IPAddresses: parsed,
+		IPAddresses: parsedIPs,
 		Subject: pkix.Name{
 			CommonName: cn,
 		},

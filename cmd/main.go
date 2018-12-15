@@ -9,8 +9,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/filipovi/simpleca/certificat"
-	"github.com/filipovi/simpleca/key"
+	"github.com/filipovi/simpleca/pkg/certificat"
+	"github.com/filipovi/simpleca/pkg/key"
 )
 
 type simpleCA struct {
@@ -49,7 +49,7 @@ func newCA(ips, dns *string) (*simpleCA, error) {
 	if err != nil {
 		return nil, err
 	}
-	c, err := certificat.New("ca-cert.pm", pk)
+	c, err := certificat.New("ca-cert.pem", pk)
 	if err != nil {
 		return nil, err
 	}
